@@ -1,5 +1,6 @@
 import mutagen
 import os
+import csv
 from tkinter import *
 from tkinter.filedialog import askdirectory
 import sys
@@ -7,64 +8,101 @@ import sys
 import pygame
 
 #File chooser
-root = Tk()
-root.minsize(300, 300)
+#root = Tk()
+#root.minsize(300, 300)
 
-listOfSongs = []
+list_of_songs = []
 index = 0
+current_file = "E:\\14 - Together In Electric Dreams.flac"
+FORMATS = ['.mp3', '.wav', '.ogg', '.flac']
+FOLDER_PATH = r'C:\Users\Lenovo PC\Documents\Sound-Traverse'
 
-def directoryChooser():
+
+class song_tags:
+
+    def __init__(self, name, title, artist, album, tr_num, date, genre, len, format):
+        self.name = name
+        self.title = title
+        self.artist = artist
+        self.album = album
+        self.tr_num = tr_num
+        self.date = date
+        self.genre = genre
+        self.len = len
+        self.format = format
+
+    #Creates tags base
+    def make_base(self):
+        try:
+            open('tags_base.txt', "r")
+        except FileNotFoundError:
+            open(FOLDER_PATH + r'\\{}'.format('tags_base.txt'), 'w')
+
+    #Read tags and adds song whth its tags to the base
+    def info(currentFile):
+        key_tags = ['name', 'title', 'artist', 'album', 'date', 'genre']
+        curr_tags = {}
+        current_audio = mutagen.File(currentFile)
+        for key in key_tags:
+            curr_key = key.strip('\'')
+            try:
+                curr_tags[curr_key] = str(current_audio[key])
+            except KeyError:
+                curr_tags[curr_key] = "None"
+    #
+    def update_track(path):
+        pass
+
+    def update_folder(path):
+        pass
+
+    def directory_chooser():
+        directory = askdirectory()
+        os.chdir(directory)
+
+        for format in FORMATS:
+            for files in os.listdir(directory):
+                if files.endswith(format):
+                    list_of_songs.append(files)
+
+
+#directory_chooser()
+#make_base()
+#for rec in list_of_songs:
+#    print(rec + "\n")
+
+
+def directory_chooser():
     directory = askdirectory()
     os.chdir(directory)
 
-    for files in os.listdir(directory):
-        if files.endswith(".flac"):
-            listOfSongs.append(files)
+    for format in FORMATS:
+        for files in os.listdir(directory):
+            if files.endswith(format):
+                info(files)
+                list_of_songs.append(files)
 
-#directoryChooser()
-
-currentFile = "F:\\02 - Les chants magnetiques II.flac"
-
-# Tags base
-def make_base():
-    try:
-        open('tags_base.txt', 'r')
-    except IOError:
-        createList()
-
-
-def addToBase():
-    for i in selectFolder:
-        pass
-
-
-def updateMeta(filepath):
-    pass
-
-
-def currentFileInfo(currentFile):
-    current_tags = []
+def info(currentFile):
+    key_tags = ['name', 'title', 'artist', 'album', 'date', 'genre']
+    curr_tags = {}
     current_audio = mutagen.File(currentFile)
-    try:
-        artist = str(current_audio["artist"])
-    except KeyError:
-        artist = "None"
-    try:
-        album = str(current_audio["album"])
-    except KeyError:
-        album = "None"
-    """try:
-        year = current_audio["year"]
-    except IOError:
-        year = "None"""""
+    for key in key_tags:
+        curr_key = key.strip('\'')
+        if key == 'name':
+            try:
+                curr_tags[curr_key] = str(currentFile)
+            except KeyError:
+                curr_tags[curr_key] = "None"
+            except TypeError:
+                print("Typ się wywalił z rowerka")
+        else:
+            try:
+                curr_tags[curr_key] = str(current_audio[key])
+            except KeyError:
+                curr_tags[curr_key] = "None"
+            except TypeError:
+                print("Typ się wywalił z rowerka")
+    print(curr_tags)
+    print('\n')
 
-    print(artist + '\n')
-    print(album + '\n')
-    # print("\n" + str(current_audio["title"]) + "\n" + str(current_audio["artist"]) + "\n" + str(current_audio) + "\n" + str(current_audio['album']) + "\n")
-
-
-#currentFileInfo(currentFile)
-basepath = 'F:'
-for entry in os.listdir(basepath):
-    if os.path.isdir(os.path.join(basepath, entry)):
-        print(entry)
+directory_chooser()
