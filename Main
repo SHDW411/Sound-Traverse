@@ -1,0 +1,407 @@
+from tkinter import *
+from PIL import ImageTk, Image
+import wave
+import matplotlib.pyplot as plt
+import numpy as np
+#import pyaudio
+from scipy import signal
+import scipy.io.wavfile as wavfile
+import audioop
+import simpleaudio as sa
+import sounddevice as sd
+import time
+
+shape_func = 0
+loudnes = 0
+freq = 440
+sampling_rate = 44100
+length = 10
+running = False
+
+def close():
+    exit()
+
+def Generator():
+    shape = {0 : 'Sinus', 1 : 'Kwadrat', 2 : 'Piła', 3 : 'Chirp'}
+    shape_name = StringVar()
+    shape_name.set(shape[shape_func])
+    sr_var = StringVar()
+    sr_var.set(sampling_rate)
+    freq_var = StringVar()
+    freq_var.set(freq)
+    length_var = StringVar()
+    length_var.set(length)
+
+    def shape_up():
+        global shape_func
+        if shape_func == 3:
+            shape_func = 0
+        else:
+            shape_func += 1
+        shape_name.set(shape[shape_func])
+
+    def shape_down():
+        global shape_func
+        if shape_func == 0:
+            shape_func = 3
+        else:
+            shape_func -= 1
+        shape_name.set(shape[shape_func])
+
+    def evaluate(event):
+        global freq
+        global length
+        global sampling_rate
+        freq = int(freq_ent.get())
+        length = int(length_ent.get())
+        sampling_rate = int(sr_ent.get())
+        print(freq)
+        print(length)
+        print(sampling_rate)
+
+
+    def generation():
+        global shape_func
+        global length
+        global sampling_rate
+        global freq
+        if shape_func == 0:
+            f = wave.open('test.wav', 'w')
+            f.setnchannels(2)
+            f.setsampwidth(2)
+            f.setframerate(44100)
+            t = np.linspace(0, length, length  * sampling_rate, False)
+            note = np.sin(freq * t * 2 * np.pi)
+            audio = note * (2 ** 15 - 1) / np.max(np.abs(note))
+            audio = audio.astype(np.int16)
+            play_obj = sa.play_buffer(audio, 1, 2, sampling_rate)
+            play_obj.wait_done()
+            fourier = np.fft.fft(note) / len(note)
+            fourier = fourier[range(int(len(note) / 2))]
+            tpCount = len(note)
+            values = np.arange(int(tpCount / 2))
+            timeperiod = tpCount / sampling_rate
+            frequencies = values / timeperiod
+            plt.figure(figsize=(15,15))
+            plt.subplot(121)
+            plt.plot(t, note)
+            plt.grid(True)
+            plt.subplot(122)
+            plt.plot(frequencies, abs(fourier))
+            plt.grid(True)
+            plt.show()
+
+            f.writeframesraw(audio)
+            f.close()
+        elif shape_func == 1:
+            f = wave.open('test.wav', 'w')
+            f.setnchannels(2)
+            f.setsampwidth(2)
+            f.setframerate(44100)
+            t = np.linspace(0, length, length * sampling_rate, False)
+            note = signal.square(freq * t * 2 * np.pi)
+            audio = note * (2 ** 15 - 1) / np.max(np.abs(note))
+            audio = audio.astype(np.int16)
+            play_obj = sa.play_buffer(audio, 1, 2, sampling_rate)
+            play_obj.wait_done()
+            fourier = np.fft.fft(note) / len(note)
+            fourier = fourier[range(int(len(note) / 2))]
+            tpCount = len(note)
+            values = np.arange(int(tpCount / 2))
+            timeperiod = tpCount / sampling_rate
+            frequencies = values / timeperiod
+            plt.figure(figsize=(15, 15))
+            plt.subplot(121)
+            plt.plot(t, note)
+            plt.grid(True)
+            plt.subplot(122)
+            plt.plot(frequencies, abs(fourier))
+            plt.grid(True)
+            plt.show()
+            f.writeframesraw(audio)
+            f.close()
+        elif shape_func == 2:
+            f = wave.open('test.wav', 'w')
+            f.setnchannels(2)
+            f.setsampwidth(2)
+            f.setframerate(44100)
+            t = np.linspace(0, length, length * sampling_rate, False)
+            note = signal.sawtooth(freq * t * 2 * np.pi)
+            audio = note * (2 ** 15 - 1) / np.max(np.abs(note))
+            audio = audio.astype(np.int16)
+            play_obj = sa.play_buffer(audio, 1, 2, sampling_rate)
+            play_obj.wait_done()
+            fourier = np.fft.fft(note) / len(note)
+            fourier = fourier[range(int(len(note) / 2))]
+            tpCount = len(note)
+            values = np.arange(int(tpCount / 2))
+            timeperiod = tpCount / sampling_rate
+            frequencies = values / timeperiod
+            plt.figure(figsize=(15, 15))
+            plt.subplot(121)
+            plt.plot(t, note)
+            plt.grid(True)
+            plt.subplot(122)
+            plt.plot(frequencies, abs(fourier))
+            plt.grid(True)
+            plt.show()
+            f.writeframesraw(audio)
+            f.close()
+        elif shape_func == 3:
+            f = wave.open('test.wav', 'w')
+            f.setnchannels(2)
+            f.setsampwidth(2)
+            f.setframerate(44100)
+            t = np.linspace(0, length, length * sampling_rate, False)
+            note = signal.chirp(t,20,5,freq,method='logarithmic')
+            audio = note * (2 ** 15 - 1) / np.max(np.abs(note))
+            audio = audio.astype(np.int16)
+            play_obj = sa.play_buffer(audio, 1, 2, sampling_rate)
+            play_obj.wait_done()
+            fourier = np.fft.fft(note) / len(note)
+            fourier = fourier[range(int(len(note) / 2))]
+            tpCount = len(note)
+            values = np.arange(int(tpCount / 2))
+            timeperiod = tpCount / sampling_rate
+            frequencies = values / timeperiod
+            plt.figure(figsize=(15, 15))
+            plt.subplot(121)
+            plt.plot(t, note)
+            plt.grid(True)
+            plt.subplot(122)
+            plt.plot(frequencies, abs(fourier))
+            plt.grid(True)
+            plt.show()
+            f.writeframesraw(audio)
+            f.close()
+
+
+    gen_win = Toplevel()
+    can_gen = Canvas(gen_win, width=600, height=600)
+    gen_win.title('Generator sygnałowy')
+    gen_win.configure(bg='white')
+    can_gen.pack(fill=BOTH, expand=1)
+    sh_lab = Label(gen_win,text='Sygnał', bg='white', fg='black', font='Arial 18 bold')
+    can_gen.create_window(300, 20, anchor=N, window=sh_lab)
+    sh_l = Button(gen_win, text="<", width=3, command=shape_down, activebackground ="Green")
+    can_gen.create_window(150, 60, anchor=N, window=sh_l)
+    sh_r = Button(gen_win, text=">", width=3, command=shape_up, activebackground ="Green")
+    can_gen.create_window(450, 60, anchor=N, window=sh_r)
+    sh_lab = Label(gen_win, textvariable=shape_name, bg='white', fg='black', font='Arial 12')
+    can_gen.create_window(300, 60, anchor=N, window=sh_lab)
+
+    freq_lab=Label(gen_win, text='Częstotliwość sygnału', bg='white', fg='black', font='Arial 18 bold')
+    can_gen.create_window(300, 100, anchor=N, window=freq_lab)
+    freq_ent = Entry(gen_win, textvariable=freq_var)
+    can_gen.create_window(300, 140, anchor=N, window=freq_ent)
+    freq_ent.bind("<Return>", evaluate)
+
+    time_lab = Label(gen_win, text='Czas trwania', bg='white', fg='black', font='Arial 18 bold')
+    can_gen.create_window(300, 200, anchor=N, window=time_lab)
+    length_ent = Entry(gen_win, textvariable=length_var)
+    can_gen.create_window(300, 240, anchor=N, window=length_ent)
+    length_ent.bind("<Return>", evaluate)
+
+    sr_lab = Label(gen_win, text='Częstotliwość próbkowania', bg='white', fg='black', font='Arial 18 bold')
+    can_gen.create_window(300, 300, anchor=N, window=sr_lab)
+    sr_ent = Entry(gen_win, textvariable=sr_var)
+    can_gen.create_window(300, 340, anchor=N, window=sr_ent)
+    sr_ent.bind("<Return>", evaluate)
+
+    generation_button = Button(gen_win, text="Generuj", width=20, command=generation, activebackground="Green")
+    can_gen.create_window(300, 450, anchor=N, window=generation_button)
+
+def chanels():
+
+    def left():
+        wave_read = wave.open('Lewy kanał.wav', 'rb')
+        wave_obj = sa.WaveObject.from_wave_read(wave_read)
+        play_obj = wave_obj.play()
+        play_obj.wait_done()
+
+    def right():
+        wave_read = wave.open('prawy kanał.wav', 'rb')
+        wave_obj = sa.WaveObject.from_wave_read(wave_read)
+        play_obj = wave_obj.play()
+        play_obj.wait_done()
+
+    """
+    def ins():
+        myrecording = sd.rec(sampling_rate * length, samplerate=sampling_rate, channels=1, dtype='float32')
+        sd.wait()
+
+        if running:
+            new_recording = sd.playrec(myrecording, sampling_rate, channels=1)
+            sd.wait()
+            myrecording = new_recording
+        ch_win.after(100, ins)
+
+    def start():
+        global running
+        running = True
+        print(running)
+
+    def stop():
+        global running
+        running = False
+        print(running)
+
+    """
+
+    ch_win = Toplevel()
+    can_ch = Canvas(ch_win, width=600, height=600)
+    ch_win.title('Test kanałów')
+    ch_win.configure(bg='white')
+    can_ch.pack(fill=BOTH, expand=1)
+    left_butt = Button(ch_win, text="Lewy", width=20, command=left, activebackground="Green")
+    can_ch.create_window(150, 200, anchor=N, window=left_butt)
+    right_butt = Button(ch_win, text="Prawy", width=20, command=right, activebackground="Green")
+    can_ch.create_window(450, 200, anchor=N, window=right_butt)
+    insert_lab = Label(ch_win, text = 'Podsłuch', bg="white", fg='black', font='Arial 18 bold')
+    can_ch.create_window(300, 350, anchor=N, window=insert_lab)
+    start_button = Button(ch_win, text="Start", width=20, command=pas, activebackground="Green")
+    can_ch.create_window(150, 450, anchor=N, window=start_button)
+    stop_button = Button(ch_win, text="Stop", width=20, command=pas, activebackground="Green")
+    can_ch.create_window(450, 450, anchor=N, window=stop_button)
+    #ch_win.after(100, ins)
+
+def speed():
+    sr_var = StringVar()
+    sr_var.set(sampling_rate)
+    length_var = StringVar()
+    length_var.set(length)
+
+    def evaluate(event):
+        global length
+        global sampling_rate
+        length = int(length_ent.get())
+        sampling_rate = int(sr_ent.get())
+        print(length)
+        print(sampling_rate)
+
+    def rec():
+        f = wave.open('out.wav', 'w')
+        f.setnchannels(1)
+        f.setsampwidth(2)
+        f.setframerate(44100)
+        recording = sd.rec(int(length * sampling_rate), samplerate=sampling_rate, channels=2)
+        sd.wait()
+        f.writeframesraw(recording)
+        f.close()
+
+    def fft():
+        signal = wavfile.read('out.wav')
+        fourier = np.fft.fft(signal) / len(signal)
+        fourier = fourier[range(int(len(signal) / 2))]
+        tpCount = len(signal)
+        values = np.arange(int(tpCount / 2))
+        timeperiod = tpCount / sampling_rate
+        frequencies = values / timeperiod
+        plt.figure(figsize=(15, 15))
+        plt.plot(frequencies, abs(fourier))
+        plt.grid(True)
+        plt.show()
+
+
+
+    speed_win = Toplevel()
+    can_speed = Canvas(speed_win, width=600, height=600)
+    speed_win.title('Generator sygnałowy')
+    speed_win.configure(bg='white')
+    can_speed.pack(fill=BOTH, expand=1)
+    lab = Label(speed_win, text='Nagraj sygnał', bg='white', fg='black', font='Arial 18 bold')
+    can_speed.create_window(300, 20, anchor=N, window=lab)
+
+    generation_button = Button(speed_win, text="Nagraj", width=20, command=rec, activebackground="Green")
+    can_speed.create_window(300, 450, anchor=N, window=generation_button)
+
+    fft_button = Button(speed_win, text="FFT", width=20, command=fft, activebackground="Green")
+    can_speed.create_window(300, 500, anchor=N, window=fft_button)
+
+    time_lab = Label(speed_win, text='Czas trwania', bg='white', fg='black', font='Arial 18 bold')
+    can_speed.create_window(300, 200, anchor=N, window=time_lab)
+    length_ent = Entry(speed_win, textvariable=length_var)
+    can_speed.create_window(300, 240, anchor=N, window=length_ent)
+    length_ent.bind("<Return>", evaluate)
+
+    sr_lab = Label(speed_win, text='Częstotliwość próbkowania', bg='white', fg='black', font='Arial 18 bold')
+    can_speed.create_window(300, 300, anchor=N, window=sr_lab)
+    sr_ent = Entry(speed_win, textvariable=sr_var)
+    can_speed.create_window(300, 340, anchor=N, window=sr_ent)
+    sr_ent.bind("<Return>", evaluate)
+
+def level():
+    loudnes_level = StringVar()
+    loudnes_level.set(loudnes)
+    global sampling_rate
+    global length
+
+    def scanning():
+        def print_sound(indata, outdata, frames, time, status):
+            volume_norm = np.linalg.norm(indata) * 10
+            print(int(volume_norm))
+            loudnes_level.set(int(volume_norm))
+        if running == True:
+            with sd.Stream(callback=print_sound):
+
+                sd.sleep(1000)
+        lev_win.after(100, scanning)
+
+    def start():
+        global running
+        running = True
+        print(running)
+        scanning()
+
+    def stop():
+        global running
+        running = False
+        print(running)
+
+    lev_win = Toplevel()
+    can_lev = Canvas(lev_win, width=600, height=600)
+    lev_win.title('Miernik poziomu dźwięku')
+    lev_win.configure(bg='white')
+    can_lev.pack(fill=BOTH, expand=1)
+
+    val_lab = Label(lev_win, textvariable=loudnes_level, bg='white', fg='black', font='Arial 12')
+    can_lev.create_window(300, 60, anchor=N, window=val_lab)
+
+    start_button = Button(lev_win, text="Start", width=20, command=start, activebackground="Green")
+    can_lev.create_window(300, 250, anchor=N, window=start_button)
+
+    stop_button = Button(lev_win, text="Stop", width=20, command=stop, activebackground="Green")
+    can_lev.create_window(300, 350, anchor=N, window=stop_button)
+
+    lev_win.after(100, scanning)
+
+def pas():
+    pass
+
+# Main window
+main_win = Tk()
+can_main = Canvas(main_win, width=600, height=600)
+main_win.title('Tester dźwięku - Menu główne')
+photo1 = ImageTk.PhotoImage(Image.open("Las.jpg"))
+can_main.create_image(-600, -600, anchor=NW, image=photo1)
+can_main.pack(fill=BOTH, expand=1)
+main_win.configure(bg='black')
+Header = Label(main_win, text = 'Menu główne', bg="white", fg='black', font='Arial 18 bold')
+Header = can_main.create_window(300, 20, anchor=N, window=Header)
+button_1 = Button(main_win, text="Generator sygnałowy", command=Generator, anchor=W, width=25, activebackground ="Green")
+button_1 = can_main.create_window(300, 80, anchor=N, window=button_1)
+panorama = Button(main_win,text="Test kanałów", command=chanels, anchor=W, width=25, activebackground ="Green")
+can_main.create_window(300, 120, anchor=N, window=panorama)
+snr_butt = Button(main_win,text="SNR", command=pas, anchor=W, width=25, activebackground ="Green")
+can_main.create_window(300, 160, anchor=N, window=snr_butt)
+thd_butt = Button(main_win,text="THD", command=pas, anchor=W, width=25, activebackground ="Green")
+can_main.create_window(300, 200, anchor=N, window=thd_butt)
+sound_lev_butt = Button(main_win,text="Miernik poziomu dźwięku", command=level, anchor=W, width=25, activebackground ="Green")
+can_main.create_window(300, 240, anchor=N, window=sound_lev_butt)
+speed_butt = Button(main_win,text="Test prędkości", command=speed, anchor=W, width=25, activebackground ="Green")
+can_main.create_window(300, 280, anchor=N, window=speed_butt)
+wow_butt = Button(main_win,text="Pomiar kołysania i drżenia", command=pas, anchor=W, width=25, activebackground ="Green")
+can_main.create_window(300, 320, anchor=N, window=wow_butt)
+exit_button = Button(main_win, text='Wyjście', command=close, anchor=S, width=25, activebackground='Green')
+exit_button = can_main.create_window(300, 580, anchor=S, window=exit_button)
+main_win.mainloop()
