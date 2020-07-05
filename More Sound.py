@@ -52,4 +52,12 @@ def directory_chooser():
 
     return list_of_paths
 
+def set_vol(val):
+    volume = int(val)/100
+    mixer.music.set_volume(volume)
+
+scale = Scale(root, from_=0, to=100, orient=HORIZONTAL, command=set_vol)
+scale.set(70)
+scale.pack()
+
 root.mainloop()
