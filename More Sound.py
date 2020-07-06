@@ -9,6 +9,14 @@ mixer.init() #initializing the mixer
 
 root = Tk()
 
+#Menubar
+menubar = Menu(root)
+root.config(menu=menubar)
+subMenu = Menu(menubar, tearoff=0)
+menubar.add_cascade(label='File', menu=subMenu)
+subMenu.add_command(label='Open')
+subMenu.add_command(label='Play')
+
 
 root.geometry('300x300')
 root.title("More Sound")
@@ -22,7 +30,8 @@ StopPhoto = PhotoImage(file=r'Icons/008-square-outlined-shape.png')
 PausePhoto = PhotoImage(file=r'Icons/008-square-outlined-shape.png')
 
 def play_music():
-    mixer.music.load("D:\Muzyka\Elton John-Diamonds-2CD\CD1\\107-elton_john-saturday_nights_alright_(for_fighting).mp3")
+    #mixer.music.load("D:\Muzyka\Elton John-Diamonds-2CD\CD1\\107-elton_john-saturday_nights_alright_(for_fighting).mp3")
+    mixer.music.load(r'02. Roxy Music - Love Is The Drug.mp3')
     if mixer.music.pause():
         mixer.music.unpause()
     else:
@@ -56,8 +65,11 @@ def set_vol(val):
     volume = int(val)/100
     mixer.music.set_volume(volume)
 
+
+
 scale = Scale(root, from_=0, to=100, orient=HORIZONTAL, command=set_vol)
 scale.set(70)
+mixer.music.set_volume(70)
 scale.pack()
 
 root.mainloop()
