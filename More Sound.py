@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter.filedialog import askdirectory
+import tkinter.messagebox
 import os
 from pygame import mixer
 
@@ -9,6 +10,10 @@ mixer.init() #initializing the mixer
 
 root = Tk()
 
+#Messagebox
+def about_player():
+    tkinter.messagebox.showinfo('About player', 'Version 0.1')
+
 #Menubar
 menubar = Menu(root)
 root.config(menu=menubar)
@@ -16,6 +21,10 @@ subMenu = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='File', menu=subMenu)
 subMenu.add_command(label='Open')
 subMenu.add_command(label='Play')
+subMenu.add_command(label='Exit', command=root.destroy)
+subMenu2 = Menu(menubar, tearoff=0)
+menubar.add_cascade(label='Others', menu=subMenu2)
+subMenu2.add_command(label='Open', command=about_player)
 
 
 root.geometry('300x300')
