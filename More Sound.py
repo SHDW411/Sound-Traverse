@@ -1,31 +1,37 @@
 from tkinter import *
-from tkinter.filedialog import askdirectory
+from tkinter import filedialog
 import tkinter.messagebox
 import os
 from pygame import mixer
 
 FORMATS = ['.mp3', '.wav', '.ogg', '.flac']
 
-mixer.init() #initializing the mixer
+mixer.init()  # initializing the mixer
 
 root = Tk()
 
-#Messagebox
+
+# Messagebox
 def about_player():
     tkinter.messagebox.showinfo('About player', 'Version 0.1')
 
-#Menubar
+
+def browse_file():
+    global filename
+    filename = filedialog.askopenfilename()
+
+
+# Menubar
 menubar = Menu(root)
 root.config(menu=menubar)
 subMenu = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='File', menu=subMenu)
-subMenu.add_command(label='Open')
+subMenu.add_command(label='Open', command=browse_file)
 subMenu.add_command(label='Play')
 subMenu.add_command(label='Exit', command=root.destroy)
 subMenu2 = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='Others', menu=subMenu2)
 subMenu2.add_command(label='Open', command=about_player)
-
 
 root.geometry('300x300')
 root.title("More Sound")
@@ -38,13 +44,19 @@ PlayPhoto = PhotoImage(file=r'Icons/002-play-right-arrow-triangle-outline.png')
 StopPhoto = PhotoImage(file=r'Icons/008-square-outlined-shape.png')
 PausePhoto = PhotoImage(file=r'Icons/008-square-outlined-shape.png')
 
+
 def play_music():
-    #mixer.music.load("D:\Muzyka\Elton John-Diamonds-2CD\CD1\\107-elton_john-saturday_nights_alright_(for_fighting).mp3")
-    mixer.music.load(r'02. Roxy Music - Love Is The Drug.mp3')
-    if mixer.music.pause():
-        mixer.music.unpause()
-    else:
+    try:
+        mixer.music.load(filename)
         mixer.music.play()
+    except:
+        browse_file()
+        mixer.music.load(filename)
+        mixer.music.play()
+    # if mixer.music.pause():
+    #    mixer.music.unpause()
+    # else:
+
 
 PlayBtn = Button(root, image=PlayPhoto, command=play_music)
 PlayBtn.pack()
@@ -54,6 +66,7 @@ StopBtn.pack()
 
 PauseBtn = Button(root, image=PausePhoto, command=lambda: mixer.music.pause())
 PauseBtn.pack()
+
 
 def directory_chooser():
     directory = askdirectory()
@@ -70,15 +83,15 @@ def directory_chooser():
 
     return list_of_paths
 
-def set_vol(val):
-    volume = int(val)/100
-    mixer.music.set_volume(volume)
 
+def set_vol(val):
+    volume = int(val) / 100
+    mixer.music.set_volume(volume)
 
 
 scale = Scale(root, from_=0, to=100, orient=HORIZONTAL, command=set_vol)
 scale.set(70)
-mixer.music.set_volume(70)
+mixer.music.set_volume(0.7)
 scale.pack()
 
 root.mainloop()
