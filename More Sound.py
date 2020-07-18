@@ -10,16 +10,13 @@ mixer.init()  # initializing the mixer
 
 root = Tk()
 
-
 # Messagebox
 def about_player():
     tkinter.messagebox.showinfo('About player', 'Version 0.1')
 
-
 def browse_file():
     global filename
     filename = filedialog.askopenfilename()
-
 
 # Menubar
 menubar = Menu(root)
@@ -53,6 +50,7 @@ def play_music():
         browse_file()
         mixer.music.load(filename)
         mixer.music.play()
+    statusbar['text']= 'Playing \"' + os.path.basename(filename) + '\"'
     # if mixer.music.pause():
     #    mixer.music.unpause()
     # else:
@@ -67,6 +65,8 @@ StopBtn.pack()
 PauseBtn = Button(root, image=PausePhoto, command=lambda: mixer.music.pause())
 PauseBtn.pack()
 
+statusbar = Label(root, text,text="Welcome to More Sound", relief = SUNKEN, anchor=W)
+statusbar.pack(side=BOTTOM, fill=X)
 
 def directory_chooser():
     directory = askdirectory()
@@ -87,7 +87,6 @@ def directory_chooser():
 def set_vol(val):
     volume = int(val) / 100
     mixer.music.set_volume(volume)
-
 
 scale = Scale(root, from_=0, to=100, orient=HORIZONTAL, command=set_vol)
 scale.set(70)
