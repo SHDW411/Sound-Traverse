@@ -5,6 +5,7 @@ import os
 from pygame import mixer
 
 FORMATS = ['.mp3', '.wav', '.ogg', '.flac']
+PAUSED = FALSE
 
 mixer.init()  # initializing the mixer
 
@@ -39,22 +40,28 @@ text.pack()
 
 PlayPhoto = PhotoImage(file=r'Icons/002-play-right-arrow-triangle-outline.png')
 StopPhoto = PhotoImage(file=r'Icons/008-square-outlined-shape.png')
-PausePhoto = PhotoImage(file=r'Icons/008-square-outlined-shape.png')
+PausePhoto = PhotoImage(file=r'Icons/002-two-vertical-parallel-lines.png')
 
 
 def play_music():
-    try:
-        mixer.music.load(filename)
-        mixer.music.play()
-    except:
-        browse_file()
-        mixer.music.load(filename)
-        mixer.music.play()
+    if PAUSED == TRUE:
+        mixer.music.unpause()
+        PASUED = FALSE
+    else:
+        try:
+            mixer.music.load(filename)
+            mixer.music.play()
+        except:
+            browse_file()
+            mixer.music.load(filename)
+            mixer.music.play()
     statusbar['text']= 'Playing \"' + os.path.basename(filename) + '\"'
-    # if mixer.music.pause():
-    #    mixer.music.unpause()
-    # else:
 
+def pause_music():
+    global PAUSED
+    PAUSED = TRUE
+    mixer.music.pause()
+    statusbar['text'] = "Pause"
 
 PlayBtn = Button(root, image=PlayPhoto, command=play_music)
 PlayBtn.pack()
@@ -62,7 +69,7 @@ PlayBtn.pack()
 StopBtn = Button(root, image=StopPhoto, command=lambda: mixer.music.stop())
 StopBtn.pack()
 
-PauseBtn = Button(root, image=PausePhoto, command=lambda: mixer.music.pause())
+PauseBtn = Button(root, image=PausePhoto, command=pause_music)
 PauseBtn.pack()
 
 statusbar = Label(root, text,text="Welcome to More Sound", relief = SUNKEN, anchor=W)
