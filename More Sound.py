@@ -31,12 +31,16 @@ subMenu2 = Menu(menubar, tearoff=0)
 menubar.add_cascade(label='Others', menu=subMenu2)
 subMenu2.add_command(label='Open', command=about_player)
 
-root.geometry('300x300')
+#root.geometry('300x300')
 root.title("More Sound")
 root.iconbitmap(r'Icons/001_speaker_plus_sign_6xq_icon.ico')
 
 text = Label(root, text='More Sound')
 text.pack()
+
+#frame
+middleframe = Frame(root)
+middleframe.pack(padx=10, pady=10)
 
 PlayPhoto = PhotoImage(file=r'Icons/002-play-right-arrow-triangle-outline.png')
 StopPhoto = PhotoImage(file=r'Icons/008-square-outlined-shape.png')
@@ -63,14 +67,14 @@ def pause_music():
     mixer.music.pause()
     statusbar['text'] = "Pause"
 
-PlayBtn = Button(root, image=PlayPhoto, command=play_music)
-PlayBtn.pack()
+PlayBtn = Button(middleframe, image=PlayPhoto, command=play_music)
+PlayBtn.pack(side=LEFT, padx=10, pady=10 )
 
-StopBtn = Button(root, image=StopPhoto, command=lambda: mixer.music.stop())
-StopBtn.pack()
+StopBtn = Button(middleframe, image=StopPhoto, command=lambda: mixer.music.stop())
+StopBtn.pack(side=LEFT, padx=10, pady=10)
 
-PauseBtn = Button(root, image=PausePhoto, command=pause_music)
-PauseBtn.pack()
+PauseBtn = Button(middleframe, image=PausePhoto, command=pause_music)
+PauseBtn.pack(side=LEFT, padx=10, pady=10)
 
 statusbar = Label(root, text,text="Welcome to More Sound", relief = SUNKEN, anchor=W)
 statusbar.pack(side=BOTTOM, fill=X)
