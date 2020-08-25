@@ -68,13 +68,13 @@ def pause_music():
     statusbar['text'] = "Pause"
 
 PlayBtn = Button(middleframe, image=PlayPhoto, command=play_music)
-PlayBtn.pack(side=LEFT, padx=10, pady=10 )
+PlayBtn.grid(row=0, column=0, padx=10, pady=10 )
 
 StopBtn = Button(middleframe, image=StopPhoto, command=lambda: mixer.music.stop())
-StopBtn.pack(side=LEFT, padx=10, pady=10)
+StopBtn.grid(row=0, column=1, padx=10, pady=10)
 
 PauseBtn = Button(middleframe, image=PausePhoto, command=pause_music)
-PauseBtn.pack(side=LEFT, padx=10, pady=10)
+PauseBtn.grid(row=0, column=2, padx=10, pady=10)
 
 statusbar = Label(root, text,text="Welcome to More Sound", relief = SUNKEN, anchor=W)
 statusbar.pack(side=BOTTOM, fill=X)
